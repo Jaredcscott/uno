@@ -30,3 +30,15 @@ func TestGenerateShuffledDeck(t *testing.T) {
 	// check that the deck has the right number of total cards
 	assert.Equal(t, 108, len(deck))
 }
+
+func TestShuffleCards(t *testing.T) { 
+	deck := shuffleCards([]UnoCard{UnoCard{"red", "1"},UnoCard{"blue", "2"},UnoCard{"green", "3"}})
+	assert.NotEqual(t, deck[:0], UnoCard{"red", "1"})
+}
+
+func TestPrintCard(t *testing.T) { 
+	card := UnoCard{"red", "1"}
+	printCard(card)
+	//output //This needs to be the 'output' of the print card function
+	//assert.Equal(t,"red 1",output)
+}
