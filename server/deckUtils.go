@@ -7,7 +7,7 @@ import (
 )
 
 // Represents a card
-// Uses Value instead of Number
+// Uses value instead of Number
 // to more accurately represent non-numerical cards
 type UnoCard struct {
 	Color string `json:"color"`
@@ -63,7 +63,7 @@ func getDeckConfig() ([4]string, map[string]int, map[string]int) {
 // Credit to https://yourbasic.org/golang/shuffle-slice-array/
 func shuffleCards(a []UnoCard) []UnoCard {
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] })
+	rand.Shuffle(len(a), func(i, j int) { a[i], a[j] = a[j], a[i] }) //func Shuffle(n int, swap func(i, j int){<enter your shuffle function>}) n should not be less than 0.
 	return a
 }
 
