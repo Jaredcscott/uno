@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 	"github.com/stretchr/testify/assert"
+	"github.com/jak103/uno/model"
 	
 	//Needed for captureOutput()
 	"bytes"
@@ -39,12 +40,12 @@ func TestGenerateShuffledDeck(t *testing.T) {
 }
 
 func TestShuffleCards(t *testing.T) { 
-	deck := shuffleCards([]UnoCard{UnoCard{"red", "1"},UnoCard{"blue", "2"},UnoCard{"green", "3"}}) //Shuffling test deck
-	assert.NotEqual(t, deck[:0], UnoCard{"red", "1"}) 
+	deck := shuffleCards([]model.Card{model.Card{"red", "1"},model.Card{"blue", "2"},model.Card{"green", "3"}}) //Shuffling test deck
+	assert.NotEqual(t, deck[:0], model.Card{"red", "1"}) 
 }
 
 func TestPrintCard(t *testing.T) {
-	card := UnoCard{"red", "1"} //Card to print
+	card := model.Card{"red", "1"} //Card to print
 	re := captureOutput(func() { //Capturing the output from printcard 
 		printCard(card) 
 	})
@@ -52,7 +53,7 @@ func TestPrintCard(t *testing.T) {
 }
 
 func TestPrintCards(t *testing.T) { 
-	deck := []UnoCard{UnoCard{"red", "1"}, UnoCard{"blue", "2"}, UnoCard{"green", "3"}} //Building test deck
+	deck := []model.Card{model.Card{"red", "1"}, model.Card{"blue", "2"}, model.Card{"green", "3"}} //Building test deck
 	re := captureOutput(func() { //Capturing output from printcards
 		printCards(deck) 
 	})
