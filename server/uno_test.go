@@ -5,7 +5,6 @@ import (
 	"github.com/jak103/uno/db"
 	"github.com/jak103/uno/model"
 	"github.com/stretchr/testify/assert"
-	"os"
 	"errors"
 )
 
@@ -13,7 +12,6 @@ import (
 
 // This function is meant to get a game and a player into the data base in a usable state for testing.
 func setupGameWithPlayer(database *db.DB) (*model.Game, *model.Player) {
-	os.Setenv("DB_TYPE", "MOCK")
 	player, _ := database.CreatePlayer("Player 1")
 
 	game, _ := database.CreateGame("Game 1", player.ID)
@@ -29,7 +27,6 @@ func setupGameWithPlayer(database *db.DB) (*model.Game, *model.Player) {
 
 
 func TestDrawCard(t *testing.T) {
-	/*
 	// Test passing in a bogus game id, we should get an error
 	game, err := drawCard("Bogus game id", "Bogus player id")
 
@@ -121,17 +118,13 @@ func TestDrawCard(t *testing.T) {
 	// Assert that we got an error from the draw card function as we should have.
 	// Assert that the player didn't get any cards
 	// Assert that the draw pile didn't lose any cards.
-	assert.NotNil(t, err, "Player drew out of turn. Please make sure only the player whoes turn it is can play.")
+	assert.NotNil(t, err, "Player drew out of turn. Please make sure only the player who's turn it is can play.")
 	assert.Equal(t, "It is not your turn to play", err.Error())
 	assert.Equal(t, 0, len(player2.Cards))
 	assert.Equal(t, 107, len(game.DrawPile))
-	*/
-	// TODO: This test should be rewritten to use a MockDB
-	assert.True(t, true)
 }
 
 func TestDealCards(t *testing.T) {
-	os.Setenv("DB_TYPE", "MOCK")
 	// Generate real game in database and real player
 	database, err := db.GetDb()
 	game, player := setupGameWithPlayer(database)
@@ -193,7 +186,6 @@ func TestCheckForCardInHand(t *testing.T){
 }
 
 func TestCreatePlayer(t *testing.T){
-	os.Setenv("DB_TYPE", "MOCK")
 	// get the database
 	database, err := db.GetDb()
 	assert.Nil(t, err, "could not find database")
@@ -208,26 +200,25 @@ func TestCreatePlayer(t *testing.T){
 }
 
 func TestJoinGame(t *testing.T){
-	os.Setenv("DB_TYPE", "MOCK")
-	// get database
+	// Get database
 	database, err := db.GetDb()
 	assert.Nil(t, err, "could not find database")
-	// create a new game with one player
+	// Create a new game with one player
 	player, err := database.CreatePlayer("testPlayer")
 	assert.Nil(t, err, "could not create new player")
 	game, err := database.CreateGame("testGame", player.ID)
 	assert.Nil(t, err, "could not create game")
-	// create a new player
+	// Create a new player
 	newPlayer, err := database.CreatePlayer("joinGamePlayer")
 	assert.Nil(t, err, "could not create new player")
-	// attempt to join game
+	// Attempt to join game
 	game, err = joinGame(game.ID, newPlayer)
 	database.SaveGame(*game)
 	assert.Nil(t, err, "could not join game with new player")
-	// lookup game from database 
+	// Lookup game from database 
 	game, err = database.LookupGameByID(game.ID)
 	assert.Nil(t, err, "could not find game in database")
-	// test to see if the newPlayer is in the game
+	// Test to see if the newPlayer is in the game
 	assert.Contains(t, game.Players, *newPlayer)
 	// attempt to join an errored game
 	err = errors.New("MockDB: Error!")
@@ -237,7 +228,6 @@ func TestJoinGame(t *testing.T){
 }
 
 func TestDrawTopCard(t *testing.T) {
-	os.Setenv("DB_TYPE", "MOCK")
 	// Creating database and testing for errors
 	database, err := db.GetDb()
 	assert.Nil(t, err, "MockDB: Could not retrive database")
@@ -247,7 +237,7 @@ func TestDrawTopCard(t *testing.T) {
 	// Creating game and testing for errors 
 	game, err := database.CreateGame("Test Game", player.ID)
 	assert.Nil(t, err, "MockDB: Could not create game")
-	//Setting game.DrawPile to a test deck
+	// Setting game.DrawPile to a test deck
 	game.DrawPile = []model.Card{model.Card{"red", "1"}, model.Card{"blue", "2"}, model.Card{"green", "3"}}
 	// Testing drawTopCard
 	game, cardReturned := drawTopCard(game) 
@@ -255,7 +245,6 @@ func TestDrawTopCard(t *testing.T) {
 }
 
 func TestGoToNextPlayer(t *testing.T) {
-	os.Setenv("DB_TYPE", "MOCK")
 	// Creating database and testing for errors
 	database, err := db.GetDb()
 	assert.Nil(t, err, "MockDB: Could not retrive database")
@@ -273,12 +262,19 @@ func TestGoToNextPlayer(t *testing.T) {
 	database.SaveGame(*game)
 	game , err  = joinGame(game.ID, player2)
 	database.SaveGame(*game)
+	game = goToNextPlayer(game)
+	assert.Equal(t,0,game.CurrentPlayer)
+	// Dealing cards to players
+	game, err = dealCards(game)
+	assert.Nil(t, err, "MockDB: Could not deal cards")
 	// Testing one direction
 	game = goToNextPlayer(game)
 	assert.Equal(t,1,game.CurrentPlayer)
 	// Swapping direction
-	game.Direction = true
+	game.Direction = false
 	// Testing the other direction 
 	game = goToNextPlayer(game)
 	assert.Equal(t,0,game.CurrentPlayer)
+	game = goToNextPlayer(game)
+	assert.Equal(t,1,game.CurrentPlayer)
 }
